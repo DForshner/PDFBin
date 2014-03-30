@@ -17,6 +17,3 @@ TODO:
 - [ ] Allow the latest version of a PDFs to be accessed by both a canonical 'full text' URL and a shortened link.
 - [ ] Allow specific versions to be accessed by a 'full text' URL and a shortened link.
 
-
-- [ ] incomplete
-- [x] completed
