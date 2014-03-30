@@ -72,6 +72,9 @@ class BaseHandler(webapp2.RequestHandler):
         self.locale = i18n.set_locale(self, request)
         self.view = ViewClass()
 
+    def write(self, value):
+        self.response.write(value)
+
     def dispatch(self):
         """
             Get a session store for this request.
