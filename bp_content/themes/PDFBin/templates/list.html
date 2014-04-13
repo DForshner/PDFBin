@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PDF Bin (Beta)</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+  </head>
+  <body>
+
+    <form action="{{ upload_url|safe }}" method="POST" enctype="multipart/form-data" class="well form-horizontal">
+      <fieldset>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="form-actions">
+          <input type="file" name="file"><br>
+          <button type="submit" class="btn btn-primary">{% trans %}Upload PDF{% endtrans %}</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <hr>
+
+    <div>PDFs uploaded:</div>
+    <div>
+      <ul>
+      {% for doc in docs %}
+        <li><a href="{{ doc.url|safe }}">{{ doc.name}}</a></li>
+      {% endfor %}
+      </ul>
+    </div>
+
+  </body>
+</html>
