@@ -3,10 +3,11 @@ PDFBin
 
 A website for storing and sharing PDFs.
 
-TODO:
+Features:
 ======
 
-- [x] Upload PDFs
+- [X] Upload PDFs
+- [X] View PDFs as html/text
 - [ ] Show index page that lists most recent uploads and most voted PDFs.
 - [ ] Allow users with accounts to vote on PDFs and assign categories.
 - [ ] Add system so PDFs to be flagged for removal (copyright infringement, illegal content etc.)
