@@ -14,7 +14,6 @@ import logging
 # related third party imports
 import os
 import webapp2
-import jinja2
 import urllib
 from google.appengine.ext import ndb
 from google.appengine.api import taskqueue
@@ -31,6 +30,9 @@ from bp_includes.lib.basehandler import BaseHandler
 from bp_includes.lib.decorators import user_required
 from bp_includes.lib import captcha, utils
 import bp_includes.models as models_boilerplate
+
+# Import from current theme
+import models as models
 import forms as forms
 
 
@@ -41,11 +43,18 @@ class ListHandler(BaseHandler):
 
     def get(self):
         # List existing blobs
+        #docs = []
+        #for blob in BlobInfo.all().fetch(10):
+        #    print("Found: ", blob.filename, " - ", blob.key())
+        #    url = '/serve/' + urllib.quote(str(blob.key()).encode('utf-8'))
+        #    doc = {'name': blob.filename, 'url': url}
+        #    docs.append(doc)
+
         docs = []
-        for blob in BlobInfo.all().fetch(10):
-            print("Found: ", blob.filename, " - ", blob.key())
-            url = '/serve/' + urllib.quote(str(blob.key()).encode('utf-8'))
-            doc = {'name': blob.filename, 'url': url}
+        for blob in models.PDF.all():
+            print("Found: ", blob.file_name, " - ", blob.blob_key, " - ", blob.create_timestamp)
+            url = '/serve/' + urllib.quote(str(blob.blob_key).encode('utf-8'))
+            doc = {'name': blob.file_name, 'url': url, 'created_timestamp': blob.create_timestamp}
             docs.append(doc)
 
         upload_url = blobstore.create_upload_url('/upload/')
@@ -66,6 +75,11 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
         blob_info = upload_files[0]
         logging.info("FOUND blob info" + str(blob_info))
+
+        # Store in data store
+        pdf = models.PDF(file_name=blob_info.filename, blob_key=blob_info.key())
+        pdf.put()
+
         self.redirect('/serve/%s' % blob_info.key())
 
 
@@ -79,6 +93,10 @@ class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
         logging.info("SERVE " + str(resource))
         resource = str(urllib.unquote(resource.encode('ascii')).decode('utf-8'))
         blob_info = blobstore.BlobInfo.get(resource)
+
+        # Get blob info from data store
+        #ds_info =  models.
+
         self.send_blob(blob_info)
 
 
