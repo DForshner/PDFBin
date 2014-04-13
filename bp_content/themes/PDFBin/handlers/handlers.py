@@ -53,7 +53,7 @@ class ListHandler(BaseHandler):
         docs = []
         for blob in models.PDF.all():
             print("Found: ", blob.file_name, " - ", blob.blob_key, " - ", blob.create_timestamp)
-            url = '/serve/' + urllib.quote(str(blob.blob_key).encode('utf-8'))
+            url = '/serve/' + urllib.quote(str(blob.blob_key.key()).encode('utf-8'))
             doc = {'name': blob.file_name, 'url': url, 'created_timestamp': blob.create_timestamp}
             docs.append(doc)
 
@@ -73,6 +73,12 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
     def post(self):
         upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
+
+        if not upload_files:
+            logging.info("User did not upload file")
+            self.redirect('/list/')
+            return
+
         blob_info = upload_files[0]
         logging.info("FOUND blob info" + str(blob_info))
 
