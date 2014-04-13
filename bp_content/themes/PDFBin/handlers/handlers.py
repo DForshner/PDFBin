@@ -23,6 +23,8 @@ from bp_includes.external import httpagentparser
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
 
+
+
 # local application/library specific imports
 import bp_includes.lib.i18n as i18n
 from bp_includes.lib.basehandler import BaseHandler
@@ -48,7 +50,9 @@ class ListHandler(BaseHandler):
         #for blob in models.PDF.fetch(30):
             print("Found: ", blob.file_name, " - ", blob.blob_key, " - ", blob.create_timestamp)
             url = '/serve/' + urllib.quote(str(blob.blob_key).encode('utf-8'))
-            doc = {'name': blob.file_name, 'url': url, 'created_timestamp': blob.create_timestamp}
+            view_text_url = '/view/' + urllib.quote(str(blob.blob_key).encode('utf-8'))
+            doc = {'name': blob.file_name, 'url': url, 'view_text_url': view_text_url,
+                   'created_timestamp': blob.create_timestamp}
             docs.append(doc)
 
         upload_url = blobstore.create_upload_url('/upload/')
@@ -95,10 +99,61 @@ class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
         resource = str(urllib.unquote(resource.encode('ascii')).decode('utf-8'))
         blob_info = blobstore.BlobInfo.get(resource)
 
-        # Get blob info from data store
-        #ds_info =  models.
-
         self.send_blob(blob_info)
+
+
+from bp_content.themes.PDFBin.external.pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from bp_content.themes.PDFBin.external.pdfminer.converter import HTMLConverter, TextConverter, PDFConverter
+from bp_content.themes.PDFBin.external.pdfminer.layout import LAParams
+from bp_content.themes.PDFBin.external.pdfminer.pdfpage import PDFPage
+from bp_content.themes.PDFBin.external.pdfminer.pdfparser import PDFParser
+from bp_content.themes.PDFBin.external.pdfminer.pdfdocument import PDFDocument
+
+class ViewHandler(BaseHandler):
+    """
+    """
+
+    def get(self, **kwargs):
+        resource = kwargs['param']
+        logging.info("SERVE " + str(resource))
+        resource = str(urllib.unquote(resource.encode('ascii')).decode('utf-8'))
+        blob_info = blobstore.BlobInfo.get(resource)
+
+        blob_reader = blobstore.BlobReader(resource)
+
+        #from cStringIO import StringIO
+        #retstr = StringIO(blob_info)
+
+        # Cast to StringIO object
+        from StringIO import StringIO
+        memory_file = StringIO(blob_reader.read())
+        blob_reader.close()
+
+        # Create a PDF parser object associated with the StringIO object
+        parser = PDFParser(memory_file)
+
+        # Create a PDF document object that stores the document structure
+        document = PDFDocument(parser)
+
+        # Define parameters to the PDF device object
+        rsrcmgr = PDFResourceManager()
+        retstr = StringIO()
+
+        # Create a PDF device object
+        device = TextConverter(rsrcmgr, retstr, codec='utf-8', laparams=LAParams())
+        #device = HTMLConverter(rsrcmgr, retstr, codec='utf-8', laparams=LAParams())
+
+        # Create a PDF interpreter object
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+
+        # Process each page contained in the document
+        for page in PDFPage.create_pages(document):
+            interpreter.process_page(page)
+            data = retstr.getvalue()
+
+        self.response.out.write('<html><body>')
+        self.response.out.write("%s" % data)
+        self.response.out.write("</body></html>")
 
 
 class ContactHandler(BaseHandler):

@@ -18,6 +18,7 @@ _routes = [
     RedirectRoute('/list/', handlers.ListHandler, name='list_handler', strict_slash=True),
     RedirectRoute('/upload/', handlers.UploadHandler, name='upload_handler', strict_slash=True),
     RedirectRoute('/serve/<param:.*>', handlers.ServeHandler, name='serve_handler', strict_slash=True),
+    RedirectRoute('/view/<param:.*>', handlers.ViewHandler, name='view_handler', strict_slash=True),
 
     RedirectRoute('/', handlers.ListHandler, name='home', strict_slash=True)
 ]
