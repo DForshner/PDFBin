@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>PDF Bin (Beta)</title>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
-  </head>
-  <body>
+{% extends base_layout %}
+
+{% block title %}
+  {% trans %}PDF Bin (Beta){% endtrans %}
+{% endblock %}
+
+{% block content %}
 
     <form action="{{ upload_url|safe }}" method="POST" enctype="multipart/form-data" class="well form-horizontal">
       <fieldset>
@@ -27,5 +27,4 @@
       </ul>
     </div>
 
-  </body>
-</html>
+{% endblock %}
