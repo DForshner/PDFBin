@@ -22,7 +22,7 @@
     <div>
       <ul>
       {% for doc in docs %}
-        <li><a href="{{ doc.url|safe }}">{{ doc.name}}</a></li>
+        <li><a href="{{ doc.url|safe }}">{{ doc.name }} - {{ doc.created_timestamp }}</a></li>
       {% endfor %}
       </ul>
     </div>

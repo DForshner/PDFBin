@@ -15,9 +15,9 @@ _routes = [
     RedirectRoute('/settings/delete_account', handlers.DeleteAccountHandler, name='delete-account', strict_slash=True),
     RedirectRoute('/contact/', handlers.ContactHandler, name='contact', strict_slash=True),
 
-    RedirectRoute('/list/', handlers.ListHandler, name='list', strict_slash=True),
-    RedirectRoute('/upload/', handlers.UploadHandler, name='upload', strict_slash=True),
-    RedirectRoute('/serve/<param:.*>', handlers.ServeHandler, name='serve', strict_slash=True),
+    RedirectRoute('/list/', handlers.ListHandler, name='list_handler', strict_slash=True),
+    RedirectRoute('/upload/', handlers.UploadHandler, name='upload_handler', strict_slash=True),
+    RedirectRoute('/serve/<param:.*>', handlers.ServeHandler, name='serve_handler', strict_slash=True),
 ]
 
 def get_routes():

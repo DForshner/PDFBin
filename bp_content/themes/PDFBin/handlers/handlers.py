@@ -22,7 +22,6 @@ from webapp2_extras.i18n import gettext as _
 from bp_includes.external import httpagentparser
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.ext.blobstore import BlobInfo
 
 # local application/library specific imports
 import bp_includes.lib.i18n as i18n
@@ -42,18 +41,13 @@ class ListHandler(BaseHandler):
     """
 
     def get(self):
-        # List existing blobs
-        #docs = []
-        #for blob in BlobInfo.all().fetch(10):
-        #    print("Found: ", blob.filename, " - ", blob.key())
-        #    url = '/serve/' + urllib.quote(str(blob.key()).encode('utf-8'))
-        #    doc = {'name': blob.filename, 'url': url}
-        #    docs.append(doc)
-
+        # List 30 latest PDFs uploaded
         docs = []
-        for blob in models.PDF.all():
+        doc_key = ndb.Key("Documents", "PDFs")
+        for blob in models.PDF.query_pdf(doc_key).fetch(30):
+        #for blob in models.PDF.fetch(30):
             print("Found: ", blob.file_name, " - ", blob.blob_key, " - ", blob.create_timestamp)
-            url = '/serve/' + urllib.quote(str(blob.blob_key.key()).encode('utf-8'))
+            url = '/serve/' + urllib.quote(str(blob.blob_key).encode('utf-8'))
             doc = {'name': blob.file_name, 'url': url, 'created_timestamp': blob.create_timestamp}
             docs.append(doc)
 
@@ -83,7 +77,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         logging.info("FOUND blob info" + str(blob_info))
 
         # Store in data store
-        pdf = models.PDF(file_name=blob_info.filename, blob_key=blob_info.key())
+        doc_key = ndb.Key("Documents", "PDFs")
+        pdf = models.PDF(parent=doc_key, file_name=blob_info.filename, blob_key=blob_info.key())
         pdf.put()
 
         self.redirect('/serve/%s' % blob_info.key())
