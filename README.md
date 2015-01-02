@@ -1,6 +1,8 @@
 PDFBin
 ======
 
+### This project has been abandoned.
+
 A website for storing and sharing PDFs.
 
 Goals:
